@@ -1,13 +1,33 @@
 #!/usr/bin/env node
 
-import { program } from "commander";
+import {Builtins, Cli} from 'clipanion'
+import {version} from './helpers/version'
+import { UploadCommand } from './commands/sourcemaps/upload'
 
-program
-  .version("1.0.0")
-  .description("My Node CLI")
-  .option("-n, --name <type>", "Add your name")
-  .action((options) => {
-     process.stdout.write(`Hey, ${options.name}!`);
-  });
+const onError = (err: any) => {
+  console.log(err)
+  process.exitCode = 1
+}
 
-program.parse(process.argv);
+process.on('uncaughtException', onError)
+process.on('unhandledRejection', onError)
+
+const cli = new Cli({
+  binaryLabel: 'KF CLI',
+  binaryName: 'kf-cli',
+  binaryVersion: version,
+})
+
+cli.register(Builtins.HelpCommand)
+cli.register(Builtins.VersionCommand)
+cli.register(UploadCommand)
+
+if (require.main === module) {
+  void cli.runExit(process.argv.slice(2), {
+    stderr: process.stderr,
+    stdin: process.stdin,
+    stdout: process.stdout,
+  })
+}
+
+export {cli}
