@@ -1,0 +1,31 @@
+{
+  "name": "kf-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run clean; tsc",
+    "clean": "rm -rf dist/*",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kloudfuse/kf-cli.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kloudfuse/kf-cli/issues"
+  },
+  "homepage": "https://github.com/kloudfuse/kf-cli#readme",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "bin": {
+    "kf-cli": "./dist/index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
