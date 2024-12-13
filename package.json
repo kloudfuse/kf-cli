@@ -1,6 +1,6 @@
 {
   "name": "kf-cli",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -52,6 +52,7 @@
     "@types/async-retry": "^1.4.9",
     "@types/node": "^22.10.2",
     "@types/tiny-async-pool": "^2.0.3",
+    "prettier": "^3.4.2",
     "typescript": "^5.7.2"
   }
 }

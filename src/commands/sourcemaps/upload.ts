@@ -3,7 +3,7 @@ import {URL} from 'url'
 
 import chalk from 'chalk'
 import {Command, Option} from 'clipanion'
-import glob from 'glob'
+import { glob } from 'glob'
 
 import {doWithMaxConcurrency} from '../../helpers/concurrency'
 import {InvalidConfigurationError} from '../../helpers/errors'
@@ -52,11 +52,13 @@ export class UploadCommand extends Command {
     ],
   })
 
+  private baseUrl = Option.String('--baseUrl')
   private basePath = Option.String({required: true})
   private disableGit = Option.Boolean('--disable-git')
   private dryRun = Option.Boolean('--dry-run', false)
   private maxConcurrency = Option.String('--max-concurrency', '20', {validator: validation.isInteger()})
   private minifiedPathPrefix = Option.String('--minified-path-prefix')
+  private overrideUrl = Option.String('--overrideUrl')
   private projectPath = Option.String('--project-path', '')
   private releaseVersion = Option.String('--release-version')
   private repositoryURL = Option.String('--repository-url')
@@ -212,16 +214,16 @@ export class UploadCommand extends Command {
   }
 
   private getRequestBuilder(): RequestBuilder {
-    if (!this.config.apiKey) {
-      throw new InvalidConfigurationError(`Missing ${chalk.bold('KF_API_KEY')} in your environment.`)
-    }
+    // if (!this.config.apiKey) {
+    //   throw new InvalidConfigurationError(`Missing ${chalk.bold('KF_API_KEY')} in your environment.`)
+    // }
 
     return getRequestBuilder({
-      apiKey: this.config.apiKey,
-      baseUrl: 'https://pisco.kloudfuse.com',
+      apiKey: this.config.apiKey || '',
+      baseUrl: this.baseUrl || 'https://pisco.kloudfuse.com',
       headers: new Map([
       ]),
-      overrideUrl: 'api/v2/srcmap',
+      overrideUrl: this.overrideUrl || 'api/v2/srcmap',
     })
   }
 
