@@ -1,8 +1,8 @@
 import type { AxiosRequestConfig } from 'axios'
 
 import axios from 'axios'
+import axiosCurlirize from 'axios-curlirize';
 import {ProxyAgent} from 'proxy-agent'
-
 
 // The buildPath function is used to concatenate several paths. The goal is to have a function working for both unix
 // paths and URL whereas standard path.join does not work with both.
@@ -141,7 +141,11 @@ export const getRequestBuilder = (options: RequestOptions) => {
     proxy: false,
   }
 
-  return (args: AxiosRequestConfig) => axios.create(baseConfiguration)(overrideArgs(args))
+  return (args: AxiosRequestConfig) => {
+    const instance = axios.create(baseConfiguration);
+    axiosCurlirize(instance);
+    return instance((overrideArgs(args)));
+  }
 }
 
 export const pluralize = (nb: number, singular: string, plural: string) => {

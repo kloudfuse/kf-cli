@@ -58,49 +58,55 @@ export enum UploadStatus {
  * This handles retries as well as logging information about upload if a logger is provided in
  * the options
  */
-export const upload = (requestBuilder: RequestBuilder) => async (
-  payload: MultipartPayload,
-  opts: UploadOptions
-): Promise<UploadStatus> => {
-  opts.onUpload()
-  try {
-    await retryRequest(() => uploadMultipart(requestBuilder, payload, opts.useGzip ?? false), {
-      onRetry: opts.onRetry as ((e: unknown, attempt: number) => any) | undefined,
-      retries: opts.retries,
-    })
+export const upload =
+  (requestBuilder: RequestBuilder) =>
+  async (payload: MultipartPayload, opts: UploadOptions): Promise<UploadStatus> => {
+    opts.onUpload()
+    try {
+      await retryRequest(() => uploadMultipart(requestBuilder, payload, opts.useGzip ?? false), {
+        onRetry: opts.onRetry as ((e: unknown, attempt: number) => any) | undefined,
+        retries: opts.retries,
+      })
 
-    return UploadStatus.Success
-  } catch (error) {
-    if (error.response && error.response.statusText) {
-      // Rewrite error to have formatted error string
-      opts.onError(new Error(`${error.message} (${error.response.statusText})`))
-    } else {
-      // Default error handling
-      opts.onError(error)
+      return UploadStatus.Success
+    } catch (error) {
+      if (error.response && error.response.statusText) {
+        // Rewrite error to have formatted error string
+        opts.onError(new Error(`${error.message} (${error.response.statusText})`))
+      } else {
+        // Default error handling
+        opts.onError(error)
+      }
+
+      return UploadStatus.Failure
     }
-
-    return UploadStatus.Failure
   }
-}
 
 // Dependency follows-redirects sets a default maxBodyLength of 10 MB https://github.com/follow-redirects/follow-redirects/blob/b774a77e582b97174813b3eaeb86931becba69db/index.js#L391
 // We don't want any hard limit enforced by the CLI, the backend will enforce a max size by returning 413 errors.
 const maxBodyLength = Infinity
 
+const gzipFile = async (filename: string) => {
+  return new Promise<void>((resolve) => {
+    fs.createReadStream(filename)
+      .pipe(createGzip())
+      .pipe(fs.createWriteStream(`${filename}.gz`))
+      .on('finish', resolve)
+  })
+}
+
 const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayload, useGzip: boolean) => {
   const form = new FormData()
-  payload.content.forEach((value: MultipartValue, key: string) => {
+  payload.content.forEach(async (value: MultipartValue, key: string) => {
     switch (value.type) {
       case 'string':
         form.append(key, value.value, value.options)
         break
-      case 'file': {
-        const file = fs.createReadStream(value.path)
-        const gz = createGzip();
-        const gzipped = file.pipe(gz);
-        form.append(key, gzipped, value.options)
+      case 'file':
+        const filename = value.path
+        await gzipFile(filename);
+        form.append(key, fs.createReadStream(`${filename}.gz`), { ...value.options, filename: '@index-BvenpKSc.js.map.gz' })
         break
-      }
     }
   })
 
@@ -114,6 +120,11 @@ const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayloa
   //     ...headers,
   //   }
   // }
+  //
+
+  headers = {
+    'Content-Type': 'multipart/form-data',
+  };
 
   return request({
     data,
