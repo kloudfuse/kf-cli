@@ -94,22 +94,26 @@ const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayloa
       case 'string':
         form.append(key, value.value, value.options)
         break
-      case 'file':
-        form.append(key, fs.createReadStream(value.path), value.options)
+      case 'file': {
+        const file = fs.createReadStream(value.path)
+        const gz = createGzip();
+        const gzipped = file.pipe(gz);
+        form.append(key, gzipped, value.options)
         break
+      }
     }
   })
 
   let data: any = form
   let headers = form.getHeaders()
-  if (useGzip) {
-    const gz = createGzip()
-    data = data.pipe(gz)
-    headers = {
-      'Content-Encoding': 'gzip',
-      ...headers,
-    }
-  }
+  // if (useGzip) {
+  //   const gz = createGzip()
+  //   data = data.pipe(gz)
+  //   headers = {
+  //     'Content-Encoding': 'gzip',
+  //     ...headers,
+  //   }
+  // }
 
   return request({
     data,

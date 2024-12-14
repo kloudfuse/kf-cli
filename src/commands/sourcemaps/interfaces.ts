@@ -33,9 +33,9 @@ export class Sourcemap {
     projectPath: string
   ): MultipartPayload {
     const content = new Map<string, MultipartValue>([
-      ['event', this.getMetadataPayload(cliVersion, service, version, projectPath)],
-      ['source_map', {type: 'file', path: this.sourcemapPath, options: {filename: 'source_map'}}],
-      ['minified_file', {type: 'file', path: this.minifiedFilePath, options: {filename: 'minified_file'}}],
+      ['metadata', this.getMetadataPayload(cliVersion, service, version, projectPath)],
+      ['sourcemap', {type: 'file', path: this.sourcemapPath, options: {filename: 'sourcemap', contentType: 'application/gzip'}}],
+      // ['minified_file', {type: 'file', path: this.minifiedFilePath, options: {filename: 'minified_file'}}],
     ])
     if (this.gitData !== undefined && this.gitData.gitRepositoryPayload !== undefined) {
       content.set('repository', {
@@ -60,11 +60,8 @@ export class Sourcemap {
     projectPath: string
   ): MultipartValue {
     const metadata: {[k: string]: any} = {
-      cli_version: cliVersion,
-      minified_url: this.minifiedUrl,
-      project_path: projectPath,
+      assetPath: this.minifiedUrl,
       service,
-      type: 'js_sourcemap',
       version,
     }
     if (this.gitData !== undefined) {
@@ -76,7 +73,7 @@ export class Sourcemap {
       type: 'string',
       options: {
         contentType: 'application/json',
-        filename: 'event',
+        filename: 'metadata',
       },
       value: JSON.stringify(metadata),
     }
