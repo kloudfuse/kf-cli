@@ -1,6 +1,10 @@
 {
   "name": "kf-cli",
+<<<<<<< Updated upstream
   "version": "0.0.17",
+=======
+  "version": "0.0.29",
+>>>>>>> Stashed changes
   "description": "",
   "main": "index.js",
   "scripts": {
