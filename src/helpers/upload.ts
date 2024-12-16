@@ -104,14 +104,9 @@ const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayloa
         break
       case 'file':
         const filename = value.path
-<<<<<<< Updated upstream
-        await gzipFile(filename);
-        form.append(key, fs.createReadStream(`${filename}.gz`), { ...value.options, filename: '@index-BvenpKSc.js.map.gz' })
-=======
         const gzipReadStream = fs.createReadStream(filename)
           .pipe(createGzip());
         form.append(key, gzipReadStream, value.options)
->>>>>>> Stashed changes
         break
     }
   })
