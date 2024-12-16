@@ -176,7 +176,7 @@ export class UploadCommand extends Command {
       return payloads
     }
 
-    await this.addRepositoryDataToPayloads(payloads)
+    // await this.addRepositoryDataToPayloads(payloads)
 
     return payloads
   }

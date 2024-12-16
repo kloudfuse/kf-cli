@@ -104,8 +104,7 @@ const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayloa
         break
       case 'file':
         const filename = value.path
-        await gzipFile(filename);
-        form.append(key, fs.createReadStream(`${filename}.gz`), { ...value.options, filename: '@index-BvenpKSc.js.map.gz' })
+        form.append(key, fs.createReadStream(`${filename}.gz`), value.options)
         break
     }
   })
@@ -129,7 +128,6 @@ const uploadMultipart = async (request: RequestBuilder, payload: MultipartPayloa
   return request({
     data,
     headers,
-    maxBodyLength,
     method: 'POST',
     url: 'v1/input',
   })
