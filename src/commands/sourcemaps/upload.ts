@@ -27,7 +27,7 @@ import {
   renderSuccessfulCommand,
   renderUpload,
 } from './renderer'
-import {getMinifiedFilePath} from './utils'
+import {getMinifiedFilePath,getAssetPath} from './utils'
 import {InvalidPayload, validatePayload} from './validation'
 
 export class UploadCommand extends Command {
@@ -159,7 +159,7 @@ export class UploadCommand extends Command {
         const minifiedFilePath = getMinifiedFilePath(sourcemapPath)
         const [minifiedURL, relativePath] = this.getMinifiedURLAndRelativePath(minifiedFilePath)
 
-        return new Sourcemap(minifiedFilePath, minifiedURL, sourcemapPath, relativePath, this.minifiedPathPrefix)
+        return new Sourcemap(minifiedFilePath, getAssetPath(minifiedURL), sourcemapPath, relativePath, this.minifiedPathPrefix)
       })
     )
   }
@@ -176,7 +176,7 @@ export class UploadCommand extends Command {
       return payloads
     }
 
-    await this.addRepositoryDataToPayloads(payloads)
+    // await this.addRepositoryDataToPayloads(payloads)
 
     return payloads
   }

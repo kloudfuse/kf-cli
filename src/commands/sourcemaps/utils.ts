@@ -24,3 +24,15 @@ export const extractRepeatedPath = (path1: string, path2: string): string | unde
 
   return undefined
 }
+
+export const getAssetPath = (minifiedUrl: string) => {
+  if (minifiedUrl.startsWith('http')) {
+    return minifiedUrl;
+  }
+
+  if (minifiedUrl.startsWith('/')) {
+    return minifiedUrl;
+  }
+
+  return `/${minifiedUrl}`;
+}
