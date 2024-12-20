@@ -14,7 +14,7 @@ const INSERT = '#!/usr/bin/env node';
  * allows us to support 1+ properties whilst keeping the loop below.
  */
 if (typeof scriptPaths === 'string') {
-  scriptPaths = { "datadog-ci": scriptPaths }
+  scriptPaths = { "kf-cli": scriptPaths }
 }
 
 // Loop through all the bin we have in the package.json

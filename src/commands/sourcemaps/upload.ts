@@ -37,23 +37,24 @@ export class UploadCommand extends Command {
     category: 'RUM',
     description: 'Upload JavaScript sourcemaps to Kloudfuse.',
     details: `
-      This command will upload all JavaScript sourcemaps and their corresponding JavaScript file to Kloudfuse in order to un-minify front-end stack traces received by Datadog.\n
+      This command will upload all JavaScript sourcemaps and their corresponding JavaScript file to Kloudfuse in order to un-minify front-end stack traces received by Kloudfuse.\n
       See README for details.
     `,
     examples: [
       [
         'Upload all sourcemaps in current directory',
-        'kf-cli sourcemaps upload . --service my-service --minified-path-prefix https://kloudfuse.com --release-version 1.234',
+        'kf-cli sourcemaps upload . --service my-service --minified-path-prefix https://kloudfuse.com --release-version 1.234 --baseUrl https://playground.kloudfuse.com --client-token foobarbaz',
       ],
       [
         'Upload all sourcemaps in /home/users/ci with 50 concurrent uploads',
-        'kf-cli sourcemaps upload /home/users/ci --service my-service --minified-path-prefix https://kloudfuse.com --release-version 1.234 --max-concurrency 50',
+        'kf-cli sourcemaps upload /home/users/ci --baseUrl https://playground.kloudfuse.com  --client-token foobarbaz --service my-service --minified-path-prefix https://my-app.com --release-version 1.234 --max-concurrency 50',
       ],
     ],
   })
 
   private baseUrl = Option.String('--baseUrl')
   private basePath = Option.String({required: true})
+  private clientToken = Option.String('--client-token')
   private disableGit = Option.Boolean('--disable-git')
   private dryRun = Option.Boolean('--dry-run', false)
   private maxConcurrency = Option.String('--max-concurrency', '20', {validator: validation.isInteger()})
@@ -66,7 +67,7 @@ export class UploadCommand extends Command {
 
   private cliVersion = version
   private config = {
-    apiKey: process.env.KF_API_KEY,
+    apiKey: process.env.KF_CLIENT_TOKEN,
   }
 
   public async execute() {
@@ -219,11 +220,11 @@ export class UploadCommand extends Command {
     // }
 
     return getRequestBuilder({
-      apiKey: this.config.apiKey || '',
+      apiKey: this.config.apiKey || this.clientToken || '',
       baseUrl: this.baseUrl || 'https://pisco.kloudfuse.com',
       headers: new Map([
       ]),
-      overrideUrl: this.overrideUrl || 'api/v2/srcmap',
+      overrideUrl: this.overrideUrl || 'rum/sourcemaps',
     })
   }
 
